@@ -1,0 +1,8 @@
+prefix=/home/eren/ros_stage_task/src/simstage_group2/build/devel
+
+Name: simstage_group2
+Description: Description of simstage_group2
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
