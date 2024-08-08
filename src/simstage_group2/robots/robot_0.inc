@@ -5,7 +5,8 @@ define laser ranger(
 		samples 240
 	)
 
-	color "gray"
+	color "grey50"
+	edge_color "white"
 	size [0.04 0.04 0.04]  
 
 	block(
@@ -27,7 +28,7 @@ define robot_0 position(
 	gui_nose 1
 	drive "diff"
 	color "black"
-    edge_color "gray"
+    edge_color "black"
 	laser(pose [0.11 0.0 -0.07 0.0])
     block(
         points 6
@@ -40,3 +41,4 @@ define robot_0 position(
         z [0 1]
     )
 )
+

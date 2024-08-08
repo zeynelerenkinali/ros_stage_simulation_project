@@ -9,7 +9,7 @@ class ReactiveNavigation():
         self.cmd_vel = Twist()
         self.laser_msg = LaserScan()
         self.obstacle_distance = 100
-        self.obstacle_threshold = 0.5
+        self.obstacle_threshold = 0.28
         self.turning = False
         self.turn_direction = 1
 
@@ -52,7 +52,7 @@ class ReactiveNavigation():
                 if self.obstacle_distance < self.obstacle_threshold / 2:
                     self.turn_direction *= -1
                 
-            self.pub_CMD.publish(self.cmd_vel)
+            # self.pub_CMD.publish(self.cmd_vel)
 
                 
 
@@ -63,5 +63,6 @@ class ReactiveNavigation():
 
 if __name__ == "__main__":
     rospy.init_node("reactive_controller_py")
+
     controller = ReactiveNavigation()
     controller.run()
