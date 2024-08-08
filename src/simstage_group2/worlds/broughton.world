@@ -10,8 +10,8 @@ define floorplan model (
 window(
     size [1920 1016 1]
     rotate [ 0.000 0.000]
-    center [ 15.882 10.841 0 ]
-    scale 44.289
+    center [ 6.105 8.063 0 ]
+    scale 360.525
     show_data 1
     show_clock 1
 )
@@ -24,4 +24,4 @@ floorplan (
 
 include "../robots/robot_0.inc"
 
-simple_robot (pose [ 3.491 4.887 0.000 90.000 ] name "robot_0")
+robot_0 (pose [ 4.773 7.980 0.000 -144.000 ] name "robot_0")
