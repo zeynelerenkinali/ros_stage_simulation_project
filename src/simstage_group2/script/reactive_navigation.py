@@ -5,20 +5,21 @@ from sensor_msgs.msg import LaserScan
 
 class ReactiveNavigation():
     def __init__(self):
-
+        # Initializations for robots speed, laser variables.
         self.cmd_vel = Twist()
         self.laser_msg = LaserScan()
+        # Initialization for algorithm
         self.obstacle_distance = 100
         self.obstacle_threshold = 0.28
         self.turning = False
         self.turn_direction = 1
-
         # Topics
         self._cmd_topic = "cmd_vel"
         self._laser_topic = "base_scan"
-
+        # Correctly subsicribe and publish data by topic(get contact with robot).
         self.rospy_sub_laser = rospy.Subscriber(self._laser_topic, LaserScan, self.laser_cb, queue_size=1)
         self.pub_CMD = rospy.Publisher(self._cmd_topic, Twist, queue_size=1)
+        # Determine appropriate hertz(hz)
         self.rate = rospy.Rate(5)
 
     def laser_cb(self, msg):
@@ -26,28 +27,30 @@ class ReactiveNavigation():
     
     def calculate_command(self):
         if type(self.laser_msg.ranges) == tuple:
+            # Get minimum distance for all directions
             self.obstacle_distance = min(self.laser_msg.ranges)
+            # Get the total range from length of lidar's data
+            total_ranges = len(self.obstacle_distance)
+            # Divide the FOV to three and seperate indices to each direction in order to focus information correctly for each direciton.
+            one_third = total_ranges // 3
 
-            if self.obstacle_distance > self.obstacle_threshold:
-                if self.turning:
-                    # Finish turning before moving forward
-                    self.cmd_vel.linear.x = 0.0
-                    self.cmd_vel.angular.z = 2.0 * self.turn_direction
-                    if min(self.laser_msg.ranges) > self.obstacle_threshold:
-                        self.turning = False
-                        self.cmd_vel.angular.z = 0.0
-                else:
-                    # Move forward
-                    self.cmd_vel.linear.x = 2.0
-                    self.cmd_vel.angular.z = 0.0
-            else:
-                # Stop and turn
-                self.cmd_vel.linear.x = 0.0
-                self.cmd_vel.angular.z = 2.0 * self.turn_direction
-                self.turning = True
-                # Change direction if stuck turning
-                if self.obstacle_distance < self.obstacle_threshold / 2:
-                    self.turn_direction *= -1
+            right_indices = range(0, one_third) # Implement first 80 indices as right
+            front_indices = range(one_third, 2 * one_third) # Implement second 80 indices as front
+            left_indices = range(2 * one_third, total_ranges) # Implement third(last) 80 indices as left
+
+            # Save all distances to array variables, from indices that took before from all the lidar data.
+            right_distances = [self.laser_msg.ranges[i] for i in right_indices]
+            front_distances = [self.laser_msg.ranges[i] for i in front_indices]
+            left_distances = [self.laser_msg.ranges[i] for i in left_indices]
+
+            # Now get the minimum obstacle distance from each direction in order to detect wall
+            right_obstacle_distance = min(right_distances)
+            front_obstacle_distance = min(front_distances)
+            left_obstacle_distance = min(left_distances)
+            #------------------------
+            # Algorithm to search map
+            # -----------------------
+            # 1.
                 
             #self.pub_CMD.publish(self.cmd_vel)
             
