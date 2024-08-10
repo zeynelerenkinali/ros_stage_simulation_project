@@ -9,9 +9,9 @@ define floorplan model (
 
 window(
     size [1920 1016 1]
-    rotate [ 0.000 0.000]
-    center [ 6.105 8.063 0 ]
-    scale 360.525
+    rotate [ 0.000 32.500]
+    center [ 6.472 7.118 0 ]
+    scale 94.938
     show_data 1
     show_clock 1
 )
