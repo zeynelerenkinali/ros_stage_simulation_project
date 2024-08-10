@@ -13,9 +13,6 @@ class ReactiveNavigation():
         self.turning = False
         self.turn_direction = 1
 
-        # Params from config file
-        # self.active_robot = str(rospy.get_param("reactive_controller_py/active_robot"))
-        
         # Topics
         self._cmd_topic = "cmd_vel"
         self._laser_topic = "base_scan"
@@ -52,10 +49,8 @@ class ReactiveNavigation():
                 if self.obstacle_distance < self.obstacle_threshold / 2:
                     self.turn_direction *= -1
                 
-            # self.pub_CMD.publish(self.cmd_vel)
-
-                
-
+            #self.pub_CMD.publish(self.cmd_vel)
+            
     def run(self):
         while not rospy.is_shutdown():
             self.calculate_command()

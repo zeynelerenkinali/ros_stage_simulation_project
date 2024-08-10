@@ -3,7 +3,7 @@
 
 
  <arg name="config_name" default="robot_0"/>
- <arg name="map_name" default="broughton"/>
+ <arg name="map_name" default="example"/>
 
  <node pkg="stage_ros" type="stageros" name="stage_ros" args="$(find simstage_group2)/worlds/$(arg map_name).world"/>
 

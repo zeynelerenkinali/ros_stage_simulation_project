@@ -7,7 +7,7 @@ define laser ranger(
 
     color "red"
     edge_color "white"
-    size [0.0035 0.0035 0.0035]  
+    size [0.014 0.014 0.014]  
 
     block(
         points 36
@@ -47,14 +47,14 @@ define laser ranger(
         point[33] [0.020 -0.028]
         point[34] [0.024 -0.023]
         point[35] [0.027 -0.018]
-        z [0.9 1]
+        z [0.1 0.1]
     )  
 )
 
 define robot_0 position(
     odom_error [0.03 0.03 0.00 0.05]
     localization "odom"
-    size [0.1 0.1 0.3]  # Smaller size
+    size [0.4 0.4 1.2]  # Smaller size
     gui_nose 1
     drive "diff"
     color "black"
@@ -73,29 +73,29 @@ define robot_0 position(
         point[9] [0.034 0.0212]
         point[10] [0.027 0.0136]
         point[11] [0.03 0.01]
-        z [1 1]
+        z [0.00000 0.00000]
     )
     block(
         points 3
         point[0] [0.0449 0.0351]
         point[1] [0.0456 0.0402]
         point[2] [0.04 0.04]
-        z [1 1]
+        z [0.00000 0.00000]
     )
     block(
         points 3
         point[0] [0.0449 0.0249]
         point[1] [0.0454 0.0198]
         point[2] [0.04 0.02]
-        z [1 1]
+        z [0.00000 0.00000]
     )
     block(
         points 3
         point[0] [0.042 0.0302]
         point[1] [0.0392 0.028]
         point[2] [0.0392 0.0322]
-        z [1 1]
+        z [0.00000 0.00000]
     ) 
 
-    laser(pose [0.050 0.0 -0.040 0.09])  
+    laser(pose [0.20 0.0 -1.2 0.09])  
 )
