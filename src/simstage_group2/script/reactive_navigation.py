@@ -10,9 +10,9 @@ class ReactiveNavigation():
         self.laser_msg = LaserScan()
         # Initialization for algorithm
         self.obstacle_distance = 100
-        self.threshold = 0.8
+        self.threshold = 0.6
         self.forward_speed = 1 
-        self.turn_speed = 0.7
+        self.turn_speed = 0.9
         self.turn_cond = True
         # Topics
         self._cmd_topic = "cmd_vel"
@@ -66,7 +66,7 @@ class ReactiveNavigation():
             #--------code----------- 
             #1. ooo
             if front_obstacle_distance >= self.threshold and right_obstacle_distance >= self.threshold and left_obstacle_distance >= self.threshold:
-                self.cmd_vel.linear.x = self.forward_speed/2
+                self.cmd_vel.linear.x = self.forward_speed/1.5
                 self.cmd_vel.angular.z = self.turn_speed*2
                 # if self.turn_cond == True:     
                 #     self.cmd_vel.angular.z = 0.0
@@ -104,7 +104,7 @@ class ReactiveNavigation():
             #8. ccc
             elif front_obstacle_distance < self.threshold and right_obstacle_distance < self.threshold and left_obstacle_distance < self.threshold:
                 self.cmd_vel.linear.x = 0.0
-                self.cmd_vel.angular.z = -self.turn_speed*4
+                self.cmd_vel.angular.z = -self.turn_speed*5
             # Publish the command
             self.pub_CMD.publish(self.cmd_vel)
             
