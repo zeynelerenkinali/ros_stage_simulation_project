@@ -11,8 +11,9 @@ class ReactiveNavigation():
         # Initialization for algorithm
         self.obstacle_distance = 100
         self.threshold = 0.8
-        self.forward_speed = 1
-        self.turn_speed = 1
+        self.forward_speed = 1 
+        self.turn_speed = 0.7
+        self.turn_cond = True
         # Topics
         self._cmd_topic = "cmd_vel"
         self._laser_topic = "base_scan"
@@ -47,55 +48,63 @@ class ReactiveNavigation():
             right_obstacle_distance = min(right_distances)
             front_obstacle_distance = min(front_distances)
             left_obstacle_distance = min(left_distances)
+            # Get the maximum obstacle distance in order to get which one is wider
+            max_right_obstacle_distance = max(right_distances)
+            max_front_obstacle_distance = max(front_distances)
+            max_left_obstacle_distance = max(left_distances)
             #------------------------
-            # Algorithm to search map *c=close *o=open
+            # Algorithm to search map *c=close *o=open f r l
             # -----------------------
-            #1. If there is a wall on right, front is clear, left is clear: go straight -- coo
-            #2. else if there is a wall on right, front, left is clear: turn left -- cco
-            #3. else if there is a wall on right, front, left: turn backwards --- ccc
-            #4. else if right is clear, front is clear, left is clear: turn place that has more range(r or l) -- ooo
-            #6. else if right is clear, there is a wall on front, left is clear: turn the place that has bigger range of view(r or l sensor has more value) -- oco
-            #7. else if right is clear, front is clear, there is a wall on left: go straight -- ooc
-            #--------code-----------
-            
-            if right_obstacle_distance < self.threshold and front_obstacle_distance >= self.threshold and left_obstacle_distance >= self.threshold:
-                # Case 1: coo - Go straight
-                if right_obstacle_distance < self.threshold / 2:
-                    self.cmd_vel.linear.x = self.forward_speed
+            # 1. If there is no obstacle on front and left and right: turn radially to right - ooo 
+            # 2. If there is an obstacle on front, no obstacle on right, no obstacle on left : stop and turn the direction that is "wider"-- coo
+            # 3. If there is no obstacle on front and there is obstacle in right and no obstacle on left: go straight -- oco
+            # 4. If there is no obstacle on front and no obstacle in right there is obstacle in left: go straight-- ooc
+            # 5. If there is obstacle on front, no obstacle on right, obstacle on left, stop and turn right(maybe radially; slow linear high angular) -- coc 
+            # 6. If there is no obstacle on front and obstacle on right and left : go forward -- occ
+            # 7. If there is an obstacle on front and right no obstacle on left: stop and turn left(maybe radially; slow linear high angular) --cco
+            # 8. If there is obstacle on right front and left: stop and turn back -- ccc
+            #--------code----------- 
+            #1. ooo
+            if front_obstacle_distance >= self.threshold and right_obstacle_distance >= self.threshold and left_obstacle_distance >= self.threshold:
+                self.cmd_vel.linear.x = self.forward_speed/2
+                self.cmd_vel.angular.z = self.turn_speed*2
+                # if self.turn_cond == True:     
+                #     self.cmd_vel.angular.z = 0.0
+                #     self.turn_cond != self.turn_cond
+                # else:
+                #     self.cmd_vel.angular.z = 0.0
+                #     self.turn_cond != self.turn_cond
+            #2. coo
+            elif front_obstacle_distance < self.threshold and right_obstacle_distance >= self.threshold and left_obstacle_distance >= self.threshold:
+                self.cmd_vel.linear.x = 0.0
+                if right_obstacle_distance >= left_obstacle_distance:
                     self.cmd_vel.angular.z = -self.turn_speed
                 else:
-                    self.cmd_vel.linear.x = self.forward_speed
-                    self.cmd_vel.angular.z = 0.0
-            elif right_obstacle_distance < self.threshold and front_obstacle_distance < self.threshold and left_obstacle_distance >= self.threshold:
-                # Case 2: cco - Turn left
-                self.cmd_vel.linear.x = 0.0
+                    self.cmd_vel.angular.z = self.turn_speed
+            #3. oco
+            elif front_obstacle_distance >= self.threshold and right_obstacle_distance < self.threshold and left_obstacle_distance >= self.threshold:
+                self.cmd_vel.linear.x = self.forward_speed/2
                 self.cmd_vel.angular.z = self.turn_speed
-            elif right_obstacle_distance < self.threshold and front_obstacle_distance < self.threshold and left_obstacle_distance < self.threshold:
-                # Case 3: ccc - Turn backwards
-                self.cmd_vel.linear.x = 0.0
-                self.cmd_vel.angular.z = self.turn_speed
-            elif right_obstacle_distance >= self.threshold and front_obstacle_distance >= self.threshold and left_obstacle_distance >= self.threshold:
+            #4. ooc
+            elif front_obstacle_distance >= self.threshold and right_obstacle_distance >= self.threshold and left_obstacle_distance < self.threshold:
                 self.cmd_vel.linear.x = self.forward_speed
                 self.cmd_vel.angular.z = 0.0
-            # elif right_obstacle_distance >= self.threshold and front_obstacle_distance < self.threshold and left_obstacle_distance >= self.threshold:
-            #     # Case 5: oco - Turn to the place with more range (right or left sensor has more value)
-            #     if right_obstacle_distance > left_obstacle_distance:
-            #         # Turn right
-            #         self.cmd_vel.linear.x = 0.0
-            #         self.cmd_vel.angular.z = -self.turn_speed
-            #     else:
-            #         # Turn left
-            #         self.cmd_vel.linear.x = 0.0
-            #         self.cmd_vel.angular.z = self.turn_speed
-            elif right_obstacle_distance >= self.threshold and front_obstacle_distance >= self.threshold and left_obstacle_distance < self.threshold:
-                # Case 6: ooc - Go straight
-                if left_obstacle_distance < self.threshold / 2:
-                    self.cmd_vel.linear.x = self.forward_speed
-                    self.cmd_vel.angular.z = self.turn_speed
-                else:
-                    self.cmd_vel.linear.x = self.forward_speed
-                    self.cmd_vel.angular.z = 0.0
-
+            #5. coc
+            elif front_obstacle_distance < self.threshold and right_obstacle_distance >= self.threshold and left_obstacle_distance < self.threshold:
+                self.cmd_vel.linear.x = self.forward_speed/2
+                self.cmd_vel.angular.z = -self.turn_speed*2
+            #6. occ
+            elif front_obstacle_distance >= self.threshold and right_obstacle_distance < self.threshold and left_obstacle_distance < self.threshold:
+                self.cmd_vel.linear.x = self.forward_speed
+                self.cmd_vel.angular.z = 0.0
+            #7. cco
+            elif front_obstacle_distance < self.threshold and right_obstacle_distance < self.threshold and left_obstacle_distance >= self.threshold:
+                self.cmd_vel.linear.x = 0.0
+                self.cmd_vel.angular.z = self.turn_speed
+            #8. ccc
+            elif front_obstacle_distance < self.threshold and right_obstacle_distance < self.threshold and left_obstacle_distance < self.threshold:
+                self.cmd_vel.linear.x = 0.0
+                self.cmd_vel.angular.z = -self.turn_speed*4
             # Publish the command
             self.pub_CMD.publish(self.cmd_vel)
             
