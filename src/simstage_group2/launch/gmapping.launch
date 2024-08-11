@@ -9,4 +9,5 @@
          <param name="xmax" value="30.0"/>
          <param name="ymax" value="30.0"/>
     </node>
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find simstage_group2)/config/default.rviz" />
 </launch>

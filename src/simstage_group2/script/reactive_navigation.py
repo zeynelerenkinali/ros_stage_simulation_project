@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 import rospy
+import numpy as np
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan   
 
 class ReactiveNavigation():
     def __init__(self):
-        # Initializations for robots speed, laser variables.
+        # Initializations for robots speed, laser variables.*z
         self.cmd_vel = Twist()
         self.laser_msg = LaserScan()
         # Initialization for algorithm
         self.obstacle_distance = 100
-        self.threshold = 0.6
+        self.threshold = 0.7
         self.forward_speed = 1 
         self.turn_speed = 0.9
-        self.turn_cond = True
         # Topics
         self._cmd_topic = "cmd_vel"
         self._laser_topic = "base_scan"
@@ -28,11 +28,10 @@ class ReactiveNavigation():
     
     def calculate_command(self):
         if type(self.laser_msg.ranges) == tuple:
-            # Get minimum distance for all directions
-            #self.obstacle_distance = min(self.laser_msg.ranges)
+            # Get minimum distance for all directions*e
             # Get the total range from length of lidar's data
             total_ranges = len(self.laser_msg.ranges)
-            # Divide the FOV to three and seperate indices to each direction in order to focus information correctly for each direciton.
+            # Divide the FOV to three and seperate indices to each direction in order to focus information correctly for each direciton.*k
             one_third = total_ranges // 3
 
             right_indices = range(0, one_third) # Implement first 80 indices as right
@@ -68,12 +67,6 @@ class ReactiveNavigation():
             if front_obstacle_distance >= self.threshold and right_obstacle_distance >= self.threshold and left_obstacle_distance >= self.threshold:
                 self.cmd_vel.linear.x = self.forward_speed/1.5
                 self.cmd_vel.angular.z = self.turn_speed*2
-                # if self.turn_cond == True:     
-                #     self.cmd_vel.angular.z = 0.0
-                #     self.turn_cond != self.turn_cond
-                # else:
-                #     self.cmd_vel.angular.z = 0.0
-                #     self.turn_cond != self.turn_cond
             #2. coo
             elif front_obstacle_distance < self.threshold and right_obstacle_distance >= self.threshold and left_obstacle_distance >= self.threshold:
                 self.cmd_vel.linear.x = 0.0
